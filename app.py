@@ -30,7 +30,7 @@ st.markdown("""
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Espacio arriba (por header streamlit) */
+/* Espacio arriba */
 .block-container {
     padding-top: 4rem;
 }
@@ -41,6 +41,11 @@ h1 {
     color: #7A2E5E;
     font-weight: 800;
     margin-bottom: 25px;
+}
+
+/* Elimina bloques vacíos blancos */
+div[data-testid="stMarkdownContainer"]:empty {
+    display: none;
 }
 
 /* Tarjeta */
@@ -78,11 +83,6 @@ h1 {
 .stButton>button:hover {
     background: #EC4899;
     transform: scale(1.05);
-}
-
-/* Slider */
-.css-1cpxqw2, .css-14xtw13 {
-    color: #7A2E5E;
 }
 </style>
 """, unsafe_allow_html=True)
