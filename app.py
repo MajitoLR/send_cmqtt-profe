@@ -1,3 +1,27 @@
+import paho.mqtt.client as paho
+import time
+import streamlit as st
+import json
+import platform
+
+# ------------------ MQTT ------------------
+values = 0.0
+act1="OFF"
+
+def on_publish(client,userdata,result):
+    print("el dato ha sido publicado \n")
+
+def on_message(client, userdata, message):
+    global message_received
+    time.sleep(2)
+    message_received=str(message.payload.decode("utf-8"))
+    st.write(message_received)
+
+broker="157.230.214.127"
+port=1883
+client1= paho.Client("GIT-MJ")
+client1.on_message = on_message
+
 # ------------------ ESTILO ROSADO ------------------
 st.markdown("""
 <style>
@@ -11,7 +35,7 @@ st.markdown("""
     padding-top: 4rem;
 }
 
-/* ❌ ELIMINA EL BLOQUE BLANCO */
+/* ❌ ELIMINA EL BLOQUE BLANCO DEBAJO DEL TÍTULO */
 h1 + div {
     display: none;
 }
@@ -62,3 +86,62 @@ h1 {
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ------------------ UI ------------------
+st.title("💗 Control MQTT Inteligente")
+
+st.markdown('<div class="card">', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="block">
+Controla dispositivos en tiempo real mediante MQTT.
+</div>
+
+<div class="block">
+Puedes encender o apagar el sistema 🔌 y enviar valores analógicos.
+</div>
+
+<div class="block">
+Conectado a Wokwi para simular el comportamiento en vivo.
+</div>
+""", unsafe_allow_html=True)
+
+# ------------------ INFO PYTHON ------------------
+st.write("🧠 Versión de Python:", platform.python_version())
+
+# ------------------ BOTONES ON/OFF ------------------
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button('🟢 ON'):
+        act1="ON"
+        client1= paho.Client("GIT-MJ")                           
+        client1.on_publish = on_publish                          
+        client1.connect(broker,port)  
+        message =json.dumps({"Act1":act1})
+        client1.publish("cmqtt_s", message)
+
+with col2:
+    if st.button('🔴 OFF'):
+        act1="OFF"
+        client1= paho.Client("GIT-MJ")                           
+        client1.on_publish = on_publish                          
+        client1.connect(broker,port)  
+        message =json.dumps({"Act1":act1})
+        client1.publish("cmqtt_s", message)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ------------------ SLIDER ------------------
+values = st.slider('🎚️ Ajusta el valor',0.0, 100.0)
+st.write('Valor seleccionado:', values)
+
+# ------------------ ENVÍO ANALÓGICO ------------------
+if st.button('📡 Enviar valor'):
+    client1= paho.Client("GIT-MJ")                           
+    client1.on_publish = on_publish                          
+    client1.connect(broker,port)   
+    message =json.dumps({"Analog": float(values)})
+    client1.publish("cmqtt_a", message)
+
+st.markdown('</div>', unsafe_allow_html=True)
